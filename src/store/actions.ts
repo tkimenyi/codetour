@@ -159,7 +159,7 @@ export async function moveCurrentCodeTourForward() {
   if (store.activeTour!.step < store.activeTour!.tour.steps.length - 1)
   {
     store.activeTour!.step++;
-    makeInfoAnnouncement('Moved one step forwards in the tour');
+    makeInfoAnnouncement('Moved one step forward in the tour');
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   } else {
     endCurrentCodeTour(true);

@@ -148,6 +148,7 @@ export function moveCurrentCodeTourBackward() {
     endCurrentCodeTour(true);
   } else {
     --store.activeTour!.step;
+    makeInfoAnnouncement('Moved one step backwards in the tour');
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   }
 }
@@ -158,6 +159,7 @@ export async function moveCurrentCodeTourForward() {
   if (store.activeTour!.step < store.activeTour!.tour.steps.length - 1)
   {
     store.activeTour!.step++;
+    makeInfoAnnouncement('Moved one step forwards in the tour');
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   } else {
     endCurrentCodeTour(true);

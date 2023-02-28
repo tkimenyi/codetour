@@ -67,7 +67,7 @@ export function startCodeTour(
   commands.executeCommand("setContext", IN_TOUR_KEY, true);
   commands.executeCommand("setContext", CAN_EDIT_TOUR_KEY, canEditTour);
 
-  makeInfoAnnouncement('Started tour: ' + tour.title + '.');
+  makeInfoAnnouncement("Started tour: " + tour.title + ".");
 
   if (startInEditMode) {
     store.isRecording = true;
@@ -123,10 +123,9 @@ export async function endCurrentCodeTour(fireEvent: boolean = true) {
 
   // This check is needed so that it doesn't announce the word "undefined"
   if (store.activeTour?.tour?.title) {
-    makeInfoAnnouncement('Ended tour: ' + store.activeTour?.tour?.title + '.');
-  }
-  else {
-    makeInfoAnnouncement('Ended tour.');
+    makeInfoAnnouncement("Ended tour: " + store.activeTour?.tour?.title + ".");
+  } else {
+    makeInfoAnnouncement("Ended tour.");
   }
 
   store.activeTour = null;
@@ -260,7 +259,7 @@ export async function exportTour(tour: CodeTour) {
 
   delete newTour.id;
   delete newTour.ref;
-  makeInfoAnnouncement('Exported tour');
+  makeInfoAnnouncement("Exported tour");
 
   return JSON.stringify(newTour, null, 2);
 }

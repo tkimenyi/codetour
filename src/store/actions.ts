@@ -142,23 +142,27 @@ export async function endCurrentCodeTour(fireEvent: boolean = true) {
 }
 
 export function moveCurrentCodeTourBackward() {
-  --store.activeTour!.step;
-
-  // Should probably be more concise
-  makeInfoAnnouncement("Moved one step backwards in the tour");
-
-  _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
+  if (store.activeTour!.step == 0)
+  {
+    endCurrentCodeTour(true);
+  } else {
+    --store.activeTour!.step;
+    makeInfoAnnouncement('Moved one step backwards in the tour');
+    _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
+  }
 }
 
 export async function moveCurrentCodeTourForward() {
   await progress.update();
 
-  store.activeTour!.step++;
-
-  // Should probably be more concise
-  makeInfoAnnouncement("Moved one step forwards in the tour");
-
-  _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
+  if (store.activeTour!.step < store.activeTour!.tour.steps.length - 1)
+  {
+    store.activeTour!.step++;
+    makeInfoAnnouncement('Moved one step forward in the tour');
+    _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
+  } else {
+    endCurrentCodeTour(true);
+  }
 }
 
 async function isCodeSwingWorkspace(uri: Uri) {

@@ -55,8 +55,7 @@ const TOUR_REFERENCE_PATTERN =
   /(?:\[(?<linkTitle>[^\]]+)\])?\[(?=\s*[^\]\s])(?<tourTitle>[^\]#]+)?(?:#(?<stepNumber>\d+))?\](?!\()/gm;
 const FILE_REFERENCE_PATTERN = /(\!)?(\[[^\]]+\]\()(\.[^\)]+)(?=\))/gm;
 const CODE_FENCE_PATTERN = /```[^\n]+\n(.+)\n```/gms;
-
-const DIVIDER = "\n\n---\n";
+const DIVIDER = isAccessibilitySupportOn() ? "\n" : "\n\n---\n";
 
 export function generatePreviewContent(content: string) {
   return content
@@ -133,6 +132,8 @@ export class CodeTourComment implements Comment {
 
     this.body = new MarkdownString(body);
     this.body.isTrusted = true;
+    this.body.supportHtml = true;
+    this.body.supportThemeIcons = true;
   }
 }
 
@@ -232,8 +233,13 @@ function getNextTour(): CodeTour | undefined {
 }
 
 function getHeaderText(step: CodeTourStep): string {
-  if (isAccessibilitySupportOn() && step.line && step.file) {
-    const lineAndFileInfoLabel = `This step is on line ${step.line} in file ${step.file}.`;
+  if (isAccessibilitySupportOn()) {
+    let lineAndFileInfoLabel = "";
+    if (step.line && step.file) {
+      lineAndFileInfoLabel = `This step is on line ${step.line} in file ${step.file}.`;
+    } else {
+      lineAndFileInfoLabel = "There is no file associated with this step.";
+    }
     return DIVIDER + lineAndFileInfoLabel + DIVIDER;
   } else {
     return DIVIDER;

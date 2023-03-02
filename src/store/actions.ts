@@ -123,7 +123,7 @@ export async function endCurrentCodeTour(fireEvent: boolean = true) {
 
   // This check is needed so that it doesn't announce the word "undefined"
   if (store.activeTour?.tour?.title) {
-    makeInfoAnnouncement("Ended tour: " + store.activeTour?.tour?.title + ".");
+    makeInfoAnnouncement("Ended tour: " + store.activeTour.tour.title + ".");
   } else {
     makeInfoAnnouncement("Ended tour.");
   }
@@ -144,7 +144,9 @@ export async function endCurrentCodeTour(fireEvent: boolean = true) {
 export function moveCurrentCodeTourBackward() {
   if (store.activeTour!.step == 0)
   {
-    endCurrentCodeTour(true);
+    // If we're already at the start of the tour, make an announcement to explain
+    // why the tour step hasn't changed
+    makeInfoAnnouncement('No previous tour step');
   } else {
     --store.activeTour!.step;
     makeInfoAnnouncement('Moved one step backwards in the tour');
@@ -161,7 +163,9 @@ export async function moveCurrentCodeTourForward() {
     makeInfoAnnouncement('Moved one step forward in the tour');
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   } else {
-    endCurrentCodeTour(true);
+    // If we're already at the end of the tour, make an announcement to explain
+    // why the tour step hasn't changed
+    makeInfoAnnouncement('No next tour step');
   }
 }
 

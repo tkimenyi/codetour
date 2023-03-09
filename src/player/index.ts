@@ -43,8 +43,8 @@ import { registerTreeProvider } from "./tree";
 
 import { readFileSync } from "fs";
 import { readFile } from "fs/promises";
-import * as path from "path";
-import * as oniguruma from "vscode-oniguruma";
+import { join } from "path";
+import { loadWASM, OnigScanner, OnigString } from "vscode-oniguruma";
 import { INITIAL, parseRawGrammar, Registry } from "vscode-textmate";
 
 const CONTROLLER_ID = "codetour";
@@ -150,15 +150,15 @@ export async function focusPlayer() {
   showDocument(currentThread.uri, currentThread.range);
 }
 
-var onigPath = path.join(__dirname, "./wasm/onig.wasm");
+var onigPath = join(__dirname, "./wasm/onig.wasm");
 const wasmBin = readFileSync(onigPath).buffer;
-const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
+const vscodeOnigurumaLib = loadWASM(wasmBin).then(() => {
   return {
     createOnigScanner(patterns: string[]) {
-      return new oniguruma.OnigScanner(patterns);
+      return new OnigScanner(patterns);
     },
     createOnigString(s: string) {
-      return new oniguruma.OnigString(s);
+      return new OnigString(s);
     }
   };
 });
@@ -167,7 +167,7 @@ const registry = new Registry({
   onigLib: vscodeOnigurumaLib,
   loadGrammar: async scopeName => {
     if (scopeName === "source.ts") {
-      const grammarPath = path.join(
+      const grammarPath = join(
         __dirname,
         "./grammars/TypeScript.tmLanguage"
       );
@@ -338,8 +338,10 @@ async function getHeaderText(step: CodeTourStep, uri: Uri): Promise<string> {
     let lineAndFileInfoLabel = "";
     if (step.line && step.file) {
       lineAndFileInfoLabel = await getFileContext(step.line, step.file, uri);
+    } else if (!step.line && step.file){
+      lineAndFileInfoLabel = `The step is associated with file ${step.file}.`;
     } else {
-      lineAndFileInfoLabel = "There is no file associated with this step.";
+      lineAndFileInfoLabel = "There is no file associated with this step."
     }
     return DIVIDER + lineAndFileInfoLabel + DIVIDER;
   } else {

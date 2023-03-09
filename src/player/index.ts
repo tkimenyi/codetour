@@ -315,13 +315,16 @@ async function getFileContext(
 
   const tokens = await tokenize(document.getText().split("\n"));
   let index = line - 1;
+  let functionName = "";
   while (index < tokens.length && index >= 0) {
     const lineTokens = tokens[index];
     --index;
     for (let i = lineTokens.length - 1; i >= 0; --i) {
       const tokenType = lineTokens[i].type;
       if (tokenType === "entity.name.function.ts") {
-        label += ` inside function \"${lineTokens[i].text}\"`;
+        functionName = lineTokens[i].text;
+      } else if (tokenType === "storage.type.function.ts" && functionName) {
+        label += ` inside function \"${functionName}\"`;
         return label + ".";
       }
     }

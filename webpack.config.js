@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const config = {
   entry: "./src/extension.ts",
@@ -9,6 +10,7 @@ const config = {
   },
   resolve: {
     fallback: {
+      fs: false,
       os: require.resolve("os-browserify/browser"),
       path: require.resolve("path-browserify")
     },
@@ -37,29 +39,42 @@ const config = {
       noSources: false,
       module: true,
       columns: true
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "*.wasm",
+          to: "wasm/",
+          context: "node_modules/vscode-oniguruma/release/"
+        },
+        {
+          from: "grammars/*",
+          to: "."
+        }
+      ]
     })
   ]
 };
 
 const nodeConfig = {
   ...config,
-  target: 'node',
+  target: "node",
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'extension-node.js',
+    path: path.resolve(__dirname, "dist"),
+    filename: "extension-node.js",
     libraryTarget: "commonjs2",
-    devtoolModuleFilenameTemplate: "../[resource-path]",
+    devtoolModuleFilenameTemplate: "../[resource-path]"
   }
 };
 
 const webConfig = {
   ...config,
-  target: 'webworker',
+  target: "webworker",
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'extension-web.js',
+    path: path.resolve(__dirname, "dist"),
+    filename: "extension-web.js",
     libraryTarget: "commonjs2",
-    devtoolModuleFilenameTemplate: "../[resource-path]",
+    devtoolModuleFilenameTemplate: "../[resource-path]"
   }
 };
 

@@ -41,6 +41,12 @@ import { registerTextDocumentContentProvider } from "./fileSystem/documentProvid
 import { registerStatusBar } from "./status";
 import { registerTreeProvider } from "./tree";
 
+import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
+import * as path from "path";
+import * as oniguruma from "vscode-oniguruma";
+import { INITIAL, parseRawGrammar, Registry } from "vscode-textmate";
+
 const CONTROLLER_ID = "codetour";
 const CONTROLLER_LABEL = "CodeTour";
 
@@ -144,6 +150,70 @@ export async function focusPlayer() {
   showDocument(currentThread.uri, currentThread.range);
 }
 
+var onigPath = path.join(__dirname, "./wasm/onig.wasm");
+const wasmBin = readFileSync(onigPath).buffer;
+const vscodeOnigurumaLib = oniguruma.loadWASM(wasmBin).then(() => {
+  return {
+    createOnigScanner(patterns: string[]) {
+      return new oniguruma.OnigScanner(patterns);
+    },
+    createOnigString(s: string) {
+      return new oniguruma.OnigString(s);
+    }
+  };
+});
+
+const registry = new Registry({
+  onigLib: vscodeOnigurumaLib,
+  loadGrammar: async scopeName => {
+    if (scopeName === "source.ts") {
+      const grammarPath = path.join(
+        __dirname,
+        "./grammars/TypeScript.tmLanguage"
+      );
+      return readFile(grammarPath).then(data =>
+        parseRawGrammar(data.toString())
+      );
+    }
+    console.log(`Unknown scope name: ${scopeName}`);
+    return null;
+  }
+});
+
+interface Token {
+  text: string;
+  type: string;
+}
+
+async function tokenize(lines: string[]): Promise<Token[][]> {
+  let tokens: Token[][] = [];
+  let ruleStack = INITIAL;
+  const grammar = await registry.loadGrammar("source.ts");
+  if (!grammar) {
+    console.log("Unable to load grammar.");
+    return tokens;
+  }
+
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    let lineTokens: Token[] = [];
+    const line = lines[lineIndex];
+
+    let lineResult = grammar.tokenizeLine(line, ruleStack);
+    ruleStack = lineResult.ruleStack;
+
+    for (const token of lineResult.tokens) {
+      const text = line.substring(token.startIndex, token.endIndex);
+      const type = token.scopes[token.scopes.length - 1];
+
+      lineTokens.push({ text: text, type: type });
+    }
+
+    tokens.push(lineTokens);
+  }
+
+  return tokens;
+}
+
 export async function startPlayer() {
   if (controller) {
     controller.dispose();
@@ -232,11 +302,42 @@ function getNextTour(): CodeTour | undefined {
   }
 }
 
-function getHeaderText(step: CodeTourStep): string {
+async function getFileContext(
+  line: number,
+  file: string,
+  uri: Uri
+): Promise<string> {
+  let label = `This step is on line ${line} in file ${file}`;
+  const document = await workspace.openTextDocument(uri);
+  if (document.languageId !== "typescript") {
+    return label + ".";
+  }
+
+  const tokens = await tokenize(document.getText().split("\n"));
+  let index = line - 1;
+  let functionName = "";
+  while (index < tokens.length && index >= 0) {
+    const lineTokens = tokens[index];
+    --index;
+    for (let i = lineTokens.length - 1; i >= 0; --i) {
+      const tokenType = lineTokens[i].type;
+      if (tokenType === "entity.name.function.ts") {
+        functionName = lineTokens[i].text;
+      } else if (tokenType === "storage.type.function.ts" && functionName) {
+        label += ` inside function \"${functionName}\"`;
+        return label + ".";
+      }
+    }
+  }
+
+  return label + ".";
+}
+
+async function getHeaderText(step: CodeTourStep, uri: Uri): Promise<string> {
   if (isAccessibilitySupportOn()) {
     let lineAndFileInfoLabel = "";
     if (step.line && step.file) {
-      lineAndFileInfoLabel = `This step is on line ${step.line} in file ${step.file}.`;
+      lineAndFileInfoLabel = await getFileContext(step.line, step.file, uri);
     } else {
       lineAndFileInfoLabel = "There is no file associated with this step.";
     }
@@ -337,7 +438,7 @@ async function renderCurrentStep() {
   let content = step.description;
 
   if (!store.isEditing) {
-    const header = getHeaderText(step);
+    const header = await getHeaderText(step, uri);
     content = header + content;
   }
 

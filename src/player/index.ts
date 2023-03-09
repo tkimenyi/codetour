@@ -309,17 +309,20 @@ async function getFileContext(
 ): Promise<string> {
   let label = `This step is on line ${line} in file ${file}`;
   const document = await workspace.openTextDocument(uri);
-  if (document.languageId === "typescript") {
-    let tokens = await tokenize(document.getText().split("\n"));
-    let index = line - 1;
-    while (index < tokens.length && index >= 0) {
-      const lineTokens = tokens[index];
-      for (let i = lineTokens.length - 1; i >= 0; --i) {
-        const tokenType = lineTokens[i].type;
-        if (tokenType === "entity.name.function.ts") {
-          label += ` inside function \"${lineTokens[i].text}\".`;
-          return label;
-        }
+  if (document.languageId !== "typescript") {
+    return label + ".";
+  }
+
+  const tokens = await tokenize(document.getText().split("\n"));
+  let index = line - 1;
+  while (index < tokens.length && index >= 0) {
+    const lineTokens = tokens[index];
+    --index;
+    for (let i = lineTokens.length - 1; i >= 0; --i) {
+      const tokenType = lineTokens[i].type;
+      if (tokenType === "entity.name.function.ts") {
+        label += ` inside function \"${lineTokens[i].text}\"`;
+        return label + ".";
       }
     }
   }

@@ -149,7 +149,8 @@ export function moveCurrentCodeTourBackward() {
     makeInfoAnnouncement('No previous tour step');
   } else {
     --store.activeTour!.step;
-    makeInfoAnnouncement('Moved one step backwards in the tour');
+    // Add one because the steps are zero-indexed
+    makeInfoAnnouncement(`Back: step ${store.activeTour!.step + 1} of ${store.activeTour!.tour.steps.length}`);
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   }
 }
@@ -160,7 +161,8 @@ export async function moveCurrentCodeTourForward() {
   if (store.activeTour!.step < store.activeTour!.tour.steps.length - 1)
   {
     store.activeTour!.step++;
-    makeInfoAnnouncement('Moved one step forward in the tour');
+    // Add one because the steps are zero-indexed
+    makeInfoAnnouncement(`Forward: step ${store.activeTour!.step+1} of ${store.activeTour!.tour.steps.length}`);
     _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
   } else {
     // If we're already at the end of the tour, make an announcement to explain

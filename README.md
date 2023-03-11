@@ -307,7 +307,7 @@ Once you've started a tour, the comment UI will guide you, and includes navigati
 
 <img width="500px" src="https://user-images.githubusercontent.com/116461/76151723-ca00b580-606c-11ea-9bd5-81c1d9352cef.png" />
 
-Additionally, you can use the `ctrl+right` / `ctrl+left` (Windows/Linux) and `cmd+right` / `cmd+left` (macOS) keyboard shortcuts to move forwards and backwards in the tour. The `CodeTour` tree view and status bar is also kept in sync with your current tour/step, to help the developer easily understand where they're at in the context of the broader tour.
+Additionally, you can use the `ctrl+k l` / `ctrl+k j` (Windows/Linux) and `cmd+k l` / `cmd+k j` (macOS) keyboard shortcuts to move forwards and backwards in the tour. The `CodeTour` tree view and status bar is also kept in sync with your current tour/step, to help the developer easily understand where they're at in the context of the broader tour.
 
 <img width="800px" src="https://user-images.githubusercontent.com/116461/76807453-a1319c00-67a1-11ea-9b88-7e448072f33d.gif" />
 
@@ -394,6 +394,7 @@ In addition to the available commands, the Code Tour extension also contributes 
 | `ctrl+k l`    | `cmd+k l` | Move to the previous step in the tour   |
 | `ctrl+k k`    | `cmd+k k` | End the current tour, if one is started |
 | `ctrl+k k`    | `cmd+k k` | Start a tour, if one is not started     |
+| `ctrl+k g`    | `cmd+k g` | Go to a specific tour step (within valid range)    |
 
 ## Extension API
 

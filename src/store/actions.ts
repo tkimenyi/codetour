@@ -170,6 +170,27 @@ export async function moveCurrentCodeTourForward() {
     makeInfoAnnouncement('No next tour step');
   }
 }
+export async function goToTourStep() {
+  await progress.update();
+
+  const response = await window.showInputBox({
+    prompt: `Enter the tour step number to navigate to, between 1 and ${store.activeTour!.tour.steps.length}`,
+  });
+  
+  if (response) {
+    const responseNumber: number = Number.parseInt(response);
+    if (responseNumber > 0 && responseNumber <= store.activeTour!.tour.steps.length) {
+      store.activeTour!.step = responseNumber - 1;
+      // Add one because the steps are zero-indexed
+      makeInfoAnnouncement(`Step ${store.activeTour!.step + 1} of ${store.activeTour!.tour.steps.length}`);
+      _onDidStartTour.fire([store.activeTour!.tour, store.activeTour!.step]);
+
+    }
+    else {
+      makeInfoAnnouncement(`${response} is an invalid tour step. Step value must be between 1 and ${store.activeTour!.tour.steps.length}`);
+    }
+  }
+}
 
 async function isCodeSwingWorkspace(uri: Uri) {
   const files = await workspace.findFiles("codeswing.json");

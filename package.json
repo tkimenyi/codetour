@@ -147,6 +147,12 @@
         "title": "Export Tour..."
       },
       {
+        "command": "codetour.goToTourStep",
+        "title": "Go To Step",
+        "category": "CodeTour",
+        "icon": "$(arrow-right)"
+      },
+      {
         "command": "codetour.hideMarkers",
         "title": "Hide Tour Markers",
         "category": "CodeTour",
@@ -238,6 +244,10 @@
         },
         {
           "command": "codetour.endTour",
+          "when": "codetour:inTour"
+        },
+        {
+          "command": "codetour.goToTourStep",
           "when": "codetour:inTour"
         },
         {
@@ -629,6 +639,12 @@
         "when": "!codetour:inTour && !terminalFocus",
         "key": "ctrl+k k",
         "mac": "cmd+k k"
+      },
+      {
+        "command": "codetour.goToTourStep",
+        "when": "codetour:inTour",
+        "key": "ctrl+k g",
+        "mac": "cmd+k g"
       }
     ],
     "languages": [

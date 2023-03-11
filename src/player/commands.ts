@@ -10,6 +10,7 @@ import { CodeTour, store } from "../store";
 import {
   endCurrentCodeTour,
   exportTour,
+  goToTourStep,
   moveCurrentCodeTourBackward,
   moveCurrentCodeTourForward,
   selectTour,
@@ -187,6 +188,11 @@ export function registerPlayerCommands() {
   vscode.commands.registerCommand(
     `${EXTENSION_NAME}.nextTourStep`,
     moveCurrentCodeTourForward
+  );
+
+  vscode.commands.registerCommand(
+    `${EXTENSION_NAME}.goToTourStep`,
+    goToTourStep
   );
 
   vscode.commands.registerCommand(`${EXTENSION_NAME}.resumeTour`, focusPlayer);

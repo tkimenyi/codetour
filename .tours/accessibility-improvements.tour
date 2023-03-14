@@ -1,0 +1,71 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Accessibility Improvements",
+  "steps": [
+    {
+      "title": "Introduction",
+      "description": "We evaluated the accessibility of the Visual Studio Code CodeTour extension for blind and low-vision (BLV) users. Based on our findings, we made prototype-quality changes to CodeTour to improve accessibility. Finally, we identified future work items that could make CodeTour and Visual Studio Code more accessible. This tour gives an overview of the changes we made. "
+    },
+    {
+      "file": "src/player/a11yhelpers.ts",
+      "description": "This function allow us to determine if user has accessibility support enabled in their settings. This setting controls if the VS Code should run in a mode where it is optimized for screen readers. All our changes are behind this flag to make sure we are respecting the user's settings. The flag is set to `auto` in VS Code by default, so these features will be enabled by default. However, if a user specifically sets their VS Code preference to `off`, they will not get the extra functionality and context that we added to support screenreader use.",
+      "line": 3
+    },
+    {
+      "file": "src/player/a11yhelpers.ts",
+      "description": "Thi util is used to show an \"info\" announcement as the BLV user is navigating the tour. It displays a visual popup, and is announced by the screenreader in the style of a notification. Our sponsor suggested that we use this when we faced obstacles while trying to set up custom audio cues.",
+      "line": 11
+    },
+    {
+      "file": "package.json",
+      "description": "This is the \"Go To Tour Step\" command that allows the BLV user to go to a particular step in the tour. This entry registers the command to be accessed via the Command Palette (Ctrl/Cmd+Shift+P) under \"CodeTour: Go To Step\".",
+      "line": 150
+    },
+    {
+      "file": "package.json",
+      "description": "We modified some of the key bindings to make it easier for the BLV user to quickly navigate the code and remove conflicts between those used in CodeTour with the editor navigation keys. Now all CodeTour shortcuts start with Ctrl+K (or Cmd+K) followed by another key.",
+      "line": 620
+    },
+    {
+      "file": "src/store/actions.ts",
+      "description": "This function handles the \"Go To Tour Step\" command from the user. Once the user inputs a number between 1 and the length of the step, this functions opens that step and make it the active step. It also announces the step number to make sure the BLV user knows which step was opened. ",
+      "line": 173
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "This is where we add the extra context that helps a BLV user know where the tour step is within the file. We make sure to only add the context when the user is not in edit mode (i.e the user is in preview mode), because we don't want the extra context to be saved as part of the tour.",
+      "line": 443
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "In this function, we must first make sure that the user has accessibility support enabled. The extra context is not added when accessibility is turned off. ",
+      "line": 337
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "For steps that are associated with a particular line and a valid file, we try to determine extra context that we can provide to the BLV user. ",
+      "line": 340
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "Currently, we have support for TypeScript for loading extra context (ie enclosing function names). In the future, we would figure out how to add support for other languages without adding our own source files. The VS Code API does not support this use case currently.",
+      "line": 312
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "This tokenizes the document. We loop through the tokens to determine the scope of the line where the current step is. If the current step's scope is a function, we return the name of that function. In the future, we would generalize this to work for all languages, not only Typescript.",
+      "line": 316
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "When accessibility support is turned off, the Comments view includes buttons for navigating to the next or previous step in the tour. This was an existing functionality; however, upon consultation with our sponsor, we decided to not have the buttons in the step when accessibility support is turned on. This information is redundant for the BLV user and adds unnecessary noise for screen readers.",
+      "line": 453
+    },
+    {
+      "file": "src/player/index.ts",
+      "description": "These flags allow the comment body to support html code and theme icons. This improved the verbosity of the screenreader output for the original sample tour, which contains multiple emojis and links to open commands.",
+      "line": 141
+    }
+  ],
+  "ref": "main"
+}
